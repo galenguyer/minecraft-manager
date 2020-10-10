@@ -90,6 +90,15 @@ def minecraft():
     else:
         sys.exit(f'"{path}" is not a valid or writeable path')
 
+    server_name = path.strip('/').split('/')[-1]
+    print('\nDone!')
+    print('If you opted to create a systemd service, start the server by running' + \
+        f'"systemctl start {server_name}" as root')
+    print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G \
+        minecraft-server-{uver}.jar nogui". The -Xm options refer to \
+        minimum and maximum memory allocated to the JVM. Only edit these if you \
+        experience performance issues and you know what you\'re doing.')
+    sys.exit(0)
 
 def main():
     """
