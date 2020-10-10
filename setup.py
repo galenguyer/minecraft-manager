@@ -11,7 +11,7 @@ setuptools.setup(
     description="a command line tool for creating minecraft servers with a start script and optional systemd file",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/galenguyer/minecraft-manager-cli",
+    url="https://github.com/galenguyer/minecraft-manager",
     packages=setuptools.find_packages(),
     entry_points={
 		'console_scripts':[
