@@ -1,7 +1,6 @@
 """
 option parsing file for the minecraft manager
 """
-import argparse
 import os
 import sys
 import time
@@ -104,24 +103,19 @@ def main():
     """
     main method for parsing arguments
     """
-    parser = argparse.ArgumentParser(prog='mcm',
-        formatter_class=argparse.RawTextHelpFormatter,
-        usage='''mcm <module> [<args>]
-''')
-    parser.add_argument('module', help='''
-the module to use for creating a server
-valid modules:
-    minecraft
-'''.strip())
-    args = parser.parse_args()
-    #check_root()
-    if args.module == 'minecraft':
+    if len(sys.argv) > 1 and (sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+        print('Pure REPL script to create a minecraft server ' + \
+            'with a start script and optional systemd file')
+        sys.exit(0)
+    module = input('Select a module to use or type "list" to see available modules: ')
+    if not module or module == 'list':
+        print('Available modules: minecraft')
+        sys.exit(0)
+    if module == 'minecraft':
         minecraft()
     else:
-        print('module not found')
-        parser.print_help()
+        print('No valid module selected')
         sys.exit(1)
-
 
 if __name__ == '__main__':
     main()
