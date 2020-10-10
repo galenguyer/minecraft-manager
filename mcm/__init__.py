@@ -54,6 +54,32 @@ def check_root() -> None:
             sys.exit('Please run the script as root to continue')
 
 
+def create_start_script(server_name, path, jar_name):
+    """
+    create the startup script given a few arguments
+    """
+    start_script = f'''#!/usr/bin/env bash
+## {server_name}.sh
+
+# exit if a command fails
+set -o errexit
+
+# exit if required variables aren't set
+set -o nounset
+
+# return the exit status of the final command before a failure
+set -o pipefail
+
+# create a new named screen session for the server, killing any existing ones
+if screen -list | grep -q "^{server_name}$"; then
+    screen -S "{server_name}" -X quit 2>&1 >/dev/null
+fi
+screen -dmS "{server_name}" java -jar {jar_name} nogui
+'''
+    with open(Path(path, 'start.sh'), 'wt') as script_fd:
+        script_fd.write(start_script)
+
+
 def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statements
     """
     repl loop for vanilla minecraft
@@ -125,26 +151,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     time.sleep(0.5)
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {path}')
 
-    start_script = f'''#!/usr/bin/env bash
-## {server_name}.sh
-
-# exit if a command fails
-set -o errexit
-
-# exit if required variables aren't set
-set -o nounset
-
-# return the exit status of the final command before a failure
-set -o pipefail
-
-# create a new named screen session for the server, killing any existing ones
-if screen -list | grep -q "^{server_name}$"; then
-    screen -S "{server_name}" -X quit 2>&1 >/dev/null
-fi
-screen -dmS "{server_name}" java -jar minecraft-server-{selected_version}.jar nogui
-'''
-    with open(Path(path, 'start.sh'), 'wt') as script_fd:
-        script_fd.write(start_script)
+    create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
