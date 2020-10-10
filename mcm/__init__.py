@@ -61,7 +61,7 @@ def minecraft():
         urlopen('https://launchermeta.mojang.com/mc/game/version_manifest.json')\
             .read().decode('utf-8'))
     uver = input('What version of Minecraft would you like? ' + \
-        'The default is the lateset release ({versions["latest"]["release"]}): ')
+        f'The default is the lateset release ({versions["latest"]["release"]}): ')
     if uver:
         uver = uver.lower()
     else:
