@@ -54,6 +54,39 @@ def check_root() -> None:
             sys.exit('Please run the script as root to continue')
 
 
+def get_path(args):
+    """
+    get the path to save files given the command line arguments
+    """
+    # if a path argument was given, use that first
+    if args.path or args.name:
+        if args.path:
+            path = Path(args.path).resolve()
+            print(f'prioritizing path argument, saving to {path}')
+        elif args.name:
+            path = Path(Path.cwd(), args.name)
+            print(f'name given but no path, saving to {path}')
+        # if the path exists, exit, otherwise create it
+        if not path.exists():
+            try:
+                path.mkdir(parents=True)
+            except: # pylint: disable=bare-except
+                print(f'error creating path {path}, exiting')
+                sys.exit(1)
+        else:
+            print(f'{path} already exists. not overwriting')
+            sys.exit(1)
+    else:
+        path = Path.cwd()
+        # ensure we have write permissions to the path
+        if os.access(os.path.dirname(path), os.W_OK):
+            print(f'using current directory {path}')
+        else:
+            print(f'no permissions to {path}, exiting')
+            sys.exit(1)
+    return path
+
+
 def create_start_script(server_name, path, jar_name):
     """
     create the startup script given a few arguments
@@ -116,32 +149,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
         sys.exit(1)
     print(f'Using vanilla server version {selected_version}')
 
-    # if a path argument was given, use that first
-    if args.path or args.name:
-        if args.path:
-            path = Path(args.path).resolve()
-            print(f'prioritizing path argument, saving to {path}')
-        elif args.name:
-            path = Path(Path.cwd(), args.name)
-            print(f'name given but no path, saving to {path}')
-        # if the path exists, exit, otherwise create it
-        if not path.exists():
-            try:
-                path.mkdir(parents=True)
-            except: # pylint: disable=bare-except
-                print(f'error creating path {path}, exiting')
-                sys.exit(1)
-        else:
-            print(f'{path} already exists. not overwriting')
-            sys.exit(1)
-    else:
-        path = Path.cwd()
-        # ensure we have write permissions to the path
-        if os.access(os.path.dirname(path), os.W_OK):
-            print(f'using current directory {path}')
-        else:
-            print(f'no permissions to {path}, exiting')
-            sys.exit(1)
+    path = get_path(args)
 
     # if no name was given, derive it from the base name of the directory
     if not args.name:
