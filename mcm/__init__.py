@@ -1,6 +1,7 @@
 """
 option parsing file for the minecraft manager
 """
+import argparse
 import os
 import sys
 import time
@@ -99,23 +100,37 @@ def minecraft():
         'experience performance issues and you know what you\'re doing.')
     sys.exit(0)
 
+
+
+def handle_create(args):
+    """
+    dispatch creation of a server to the proper module
+    """
+    print(args.module)
+
+
 def main():
     """
     main method for parsing arguments
     """
-    if len(sys.argv) > 1 and (sys.argv[1] == '--help' or sys.argv[1] == '-h'):
-        print('Pure REPL script to create a minecraft server ' + \
-            'with a start script and optional systemd file')
-        sys.exit(0)
-    module = input('Select a module to use or type "list" to see available modules: ')
-    if not module or module == 'list':
-        print('Available modules: minecraft')
-        sys.exit(0)
-    if module == 'minecraft':
-        minecraft()
+    parser = argparse.ArgumentParser(prog='mcm')
+
+    subparsers = parser.add_subparsers(title='available actions',
+        metavar='action')
+
+    create_parser = subparsers.add_parser(
+        'create',
+        help='create a new server with start script and systemd file'
+    )
+    create_parser.add_argument('module', help='valid modules: minecraft')
+    create_parser.set_defaults(handle=handle_create)
+
+    args = parser.parse_args()
+    if hasattr(args, 'handle'):
+        args.handle(args)
     else:
-        print('No valid module selected')
-        sys.exit(1)
+        parser.print_help()
+
 
 if __name__ == '__main__':
     main()
