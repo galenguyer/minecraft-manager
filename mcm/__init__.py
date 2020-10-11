@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.request import urlopen, urlretrieve
 
 import utils # pylint: disable=import-error
+import scripts # pylint: disable=import-error
 
 MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 4)
 
@@ -45,32 +46,6 @@ def get_path(args):
             print(f'no permissions to {path}, exiting')
             sys.exit(1)
     return path
-
-
-def create_start_script(server_name, path, jar_name):
-    """
-    create the startup script given a few arguments
-    """
-    start_script = f'''#!/usr/bin/env bash
-## {server_name}.sh
-
-# exit if a command fails
-set -o errexit
-
-# exit if required variables aren't set
-set -o nounset
-
-# return the exit status of the final command before a failure
-set -o pipefail
-
-# create a new named screen session for the server, killing any existing ones
-if screen -list | grep -q "^{server_name}$"; then
-    screen -S "{server_name}" -X quit 2>&1 >/dev/null
-fi
-screen -dmS "{server_name}" java -jar {jar_name} nogui
-'''
-    with open(Path(path, 'start.sh'), 'wt') as script_fd:
-        script_fd.write(start_script)
 
 
 def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statements
@@ -119,7 +94,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     time.sleep(0.5)
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {path}')
 
-    create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
+    scripts.create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
@@ -181,7 +156,7 @@ def create_paper(args):
     time.sleep(0.5)
     print(f'\nDownloaded paper-{version}-{build}.jar to {path}')
 
-    create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
+    scripts.create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
