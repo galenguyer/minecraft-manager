@@ -30,6 +30,7 @@ screen -dmS "{server_name}" java -jar {jar_name} nogui
 '''
     with open(Path(path, 'start.sh'), 'wt') as script_fd:
         script_fd.write(start_script)
+    Path(path, 'start.sh').chmod(0o744)
 
 
 def create_systemd_file(server_name, path):
