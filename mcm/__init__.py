@@ -9,49 +9,9 @@ import json
 from pathlib import Path
 from urllib.request import urlopen, urlretrieve
 
+import utils # pylint: disable=import-error
 
 MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 4)
-
-
-def reporthook(count, block_size, total_size):
-    """
-    used for printing the status of a download
-    """
-    global START_TIME # pylint: disable=global-variable-undefined
-    if count == 0:
-        START_TIME = time.time()
-        return
-    duration = time.time() - START_TIME
-    progress_size = int(count * block_size)
-    speed = int(progress_size / (1024 * duration))
-    percent = min(int(count*block_size*100/total_size),100)
-    sys.stdout.write('\r%d%%, %d MB, %d KB/s, %d seconds passed' %
-                    (percent, progress_size / (1024 * 1024), speed, duration))
-    sys.stdout.flush()
-
-
-def get_is_root() -> bool:
-    """
-    return whether or not the script is being run as root
-    """
-    return os.getuid() == 0
-
-
-def check_root() -> None:
-    """
-    ensure the user intends to run as not root if that's the case
-    """
-    if get_is_root():
-        pass
-    else:
-        print('You are not running this script as root. ' + \
-            'This means dependencies cannot be automatically installed, ' + \
-            'and a service file cannot be created.')
-        carryon = input('Are you sure you wish to continue? [yN]: ')
-        if carryon.lower() == 'y':
-            pass
-        else:
-            sys.exit('Please run the script as root to continue')
 
 
 def get_path(args):
@@ -155,7 +115,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     if not args.name:
         server_name = path.name
 
-    urlretrieve(server_url, f'{path}/minecraft-server-{selected_version}.jar', reporthook)
+    urlretrieve(server_url, f'{path}/minecraft-server-{selected_version}.jar', utils.reporthook)
     time.sleep(0.5)
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {path}')
 
@@ -217,7 +177,7 @@ def create_paper(args):
         server_name = path.name
 
     urlretrieve(f'https://papermc.io/api/v1/paper/{version}/{build}/download', \
-        f'{path}/paper-{version}-{build}.jar', reporthook)
+        f'{path}/paper-{version}-{build}.jar', utils.reporthook)
     time.sleep(0.5)
     print(f'\nDownloaded paper-{version}-{build}.jar to {path}')
 
