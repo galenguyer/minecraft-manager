@@ -180,6 +180,7 @@ def create_paper(args):
         'experience performance issues and you know what you\'re doing.')
     sys.exit(0)
 
+
 def handle_create(args):
     """
     dispatch creation of a server to the proper module
@@ -188,7 +189,6 @@ def handle_create(args):
         create_vanilla(args)
     elif args.module == 'paper':
         create_paper(args)
-
 
 
 def main():
