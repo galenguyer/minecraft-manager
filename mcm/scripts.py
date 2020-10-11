@@ -1,6 +1,8 @@
 """
 module to handle creation of start and systemd scripts
 """
+import os
+import getpass
 from pathlib import Path
 
 
@@ -28,3 +30,32 @@ screen -dmS "{server_name}" java -jar {jar_name} nogui
 '''
     with open(Path(path, 'start.sh'), 'wt') as script_fd:
         script_fd.write(start_script)
+
+
+def create_systemd_file(server_name, path):
+    """
+    create a systemd service file if possible
+    """
+    unit_file = f'/etc/systemd/system/{server_name}-mc.service'
+    if os.path.exists(unit_file):
+        print('systemd unit file already exists')
+        return
+    if not os.access('/etc/systemd/system/', os.W_OK):
+        print('could not write to systemd unit file')
+        return
+    file_text = f'''[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+Type=forking
+User={getpass.getuser()}
+WorkingDirectory={path}
+ExecStart={path}/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+'''
+    with open(unit_file, 'wt') as script_fd:
+        script_fd.write(file_text)

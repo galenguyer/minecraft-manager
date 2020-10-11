@@ -95,6 +95,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {path}')
 
     scripts.create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
+    scripts.create_systemd_file(server_name, path)
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
@@ -157,6 +158,7 @@ def create_paper(args):
     print(f'\nDownloaded paper-{version}-{build}.jar to {path}')
 
     scripts.create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
+    scripts.create_systemd_file(server_name, path)
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
