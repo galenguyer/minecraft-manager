@@ -3,7 +3,6 @@ used for uh
 we'll see
 code hard
 """
-
 import json
 from pathlib import Path
 
@@ -11,7 +10,8 @@ def get_saves():
     """
     load saves from config file
     """
-    if not Path(Path.home(), '.config/mcm/').exists(): # pylint: disable=no-else-return
+    if not Path(Path.home(), '.config/mcm/').exists() or \
+        not Path(Path.home(), '.config/mcm/saves.json').exists(): # pylint: disable=no-else-return
         return []
     else:
         with open(Path(Path.home(), '.config/mcm/saves.json'), 'r') as file:
