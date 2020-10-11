@@ -170,6 +170,66 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     sys.exit(0)
 
 
+def create_paper(args):
+    """
+    papermc download handler
+    """
+    # valid versions can have 4 structures
+    # no version provided defaults to the latest build, as does 'latest'
+    # a single string with no '-' will be treated as a simple version
+    # the latest build of the specified version will be downloaded, if available
+    # a string with a '-', such as '1.16.3-224' will be treated as a version and build
+    paper_versions = json.loads(
+        urlopen('https://papermc.io/api/v1/paper')\
+            .read().decode('utf-8'))
+    if args.version is None or args.version == 'latest':
+        version = paper_versions['versions'][0]
+    else:
+        version = args.version.partition('-')[0]
+        if version not in paper_versions['versions']:
+            print(f'invalid paper version {args.version}')
+            sys.exit(1)
+    # now that we have a good version, get the build number
+    paper_builds = json.loads(
+        urlopen(f'https://papermc.io/api/v1/paper/{version}')\
+            .read().decode('utf-8'))
+    if args.version is not None and '-' in args.version:
+        build = args.version.partition('-')[2]
+        if build not in paper_builds['builds']['all']:
+            print(f'invalid paper build {build}')
+            sys.exit(1)
+    else:
+        build = paper_builds['builds']['latest']
+    print(f'using paper version {version}, build {build}')
+
+    # if a name argument was provided, make sure it's valid
+    if args.name:
+        server_name = args.name.strip()
+        for char in server_name:
+            if not (char.isalpha() or char.isnumeric()):
+                print(f'invalid character "{char}" in name. only letters and numbers are allowed')
+                sys.exit(1)
+
+    path = get_path(args)
+
+    # if no name was given, derive it from the base name of the directory
+    if not args.name:
+        server_name = path.name
+
+    urlretrieve(f'https://papermc.io/api/v1/paper/{version}/{build}/download', \
+        f'{path}/paper-{version}-{build}.jar', reporthook)
+    time.sleep(0.5)
+    print(f'\nDownloaded paper-{version}-{build}.jar to {path}')
+
+    create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
+
+    #print('If you opted to create a systemd service, start the server by running ' + \
+    #    f'"systemctl start {server_name}" as root')
+    print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G ' + \
+        f'paper-{version}-{build}.jar nogui". The -Xm options refer to ' + \
+        'minimum and maximum memory allocated to the JVM. Only edit these if you ' + \
+        'experience performance issues and you know what you\'re doing.')
+    sys.exit(0)
 
 def handle_create(args):
     """
@@ -177,6 +237,9 @@ def handle_create(args):
     """
     if args.module == 'vanilla' or args.module == 'minecraft':
         create_vanilla(args)
+    elif args.module == 'paper':
+        create_paper(args)
+
 
 
 def main():
@@ -194,7 +257,7 @@ def main():
     )
 
     create_parser.add_argument('module', help='the module to use when creating a server',
-        choices=['vanilla', 'minecraft'])
+        choices=['vanilla', 'minecraft', 'paper'])
     create_parser.add_argument('--version', '-v', help='the version of the selected server to use')
     create_parser.add_argument('--path', '-p', help='path to save the jar to')
     create_parser.add_argument('--name', '-n',
