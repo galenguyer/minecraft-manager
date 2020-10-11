@@ -4,6 +4,7 @@ option parsing file for the minecraft manager
 import argparse
 
 from .create import create_vanilla, create_paper
+from .update import update_server
 
 
 def handle_create(args):
@@ -14,6 +15,13 @@ def handle_create(args):
         create_vanilla(args)
     elif args.module == 'paper':
         create_paper(args)
+
+
+def handle_update(args):
+    """
+    dispatch update args
+    """
+    update_server(args)
 
 
 def main():
@@ -37,6 +45,14 @@ def main():
     create_parser.add_argument('--name', '-n',
         help='the name of the server, mostly used for the systemd file')
     create_parser.set_defaults(handle=handle_create)
+
+    update_parser = subparsers.add_parser(
+        'update',
+        help='update a server given its name'
+    )
+    update_parser.add_argument('name', help='the name of the server to update')
+    update_parser.add_argument('--version', '-v', help='the version of the selected server to use')
+    update_parser.set_defaults(handle=handle_update)
 
     args = parser.parse_args()
     if hasattr(args, 'handle'):
