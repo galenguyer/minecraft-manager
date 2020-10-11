@@ -2,7 +2,7 @@
 module to handle creation of start and systemd scripts
 """
 import os
-import getpass
+import pwd
 from pathlib import Path
 
 
@@ -49,7 +49,7 @@ After=network.target
 
 [Service]
 Type=forking
-User={getpass.getuser()}
+User={pwd.getpwuid(os.getuid())[0]}
 WorkingDirectory={path}
 ExecStart={path}/start.sh
 Restart=always
