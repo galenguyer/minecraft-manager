@@ -11,7 +11,7 @@ from urllib.request import urlopen, urlretrieve
 
 from .utils import reporthook
 from .scripts import create_start_script, create_systemd_file
-from .saves import add_server, get_save_from_path, get_save_from_name
+from .saves import add_server, save_exists
 
 
 MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 4)
@@ -92,7 +92,7 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     if not args.name:
         server_name = path.name
 
-    if get_save_from_name(server_name) or get_save_from_path(path):
+    if save_exists(server_name, path):
         print('a server with that name or path already exists')
         sys.exit(1)
 
@@ -159,7 +159,7 @@ def create_paper(args):
     if not args.name:
         server_name = path.name
 
-    if get_save_from_name(server_name) or get_save_from_path(path):
+    if save_exists(server_name, path):
         print('a server with that name or path already exists')
         sys.exit(1)
 
