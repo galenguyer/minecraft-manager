@@ -23,10 +23,10 @@ set -o nounset
 set -o pipefail
 
 # create a new named screen session for the server, killing any existing ones
-if screen -list | grep -q "^{server_name}$"; then
-    screen -S "{server_name}" -X quit 2>&1 >/dev/null
+if screen -list | grep -q "^{server_name}-mc$"; then
+    screen -S "{server_name}-mc" -X quit 2>&1 >/dev/null
 fi
-screen -dmS "{server_name}" java -jar {jar_name} nogui
+screen -dmS "{server_name}-mc" java -jar {jar_name} nogui
 '''
     with open(Path(path, 'start.sh'), 'wt') as script_fd:
         script_fd.write(start_script)
