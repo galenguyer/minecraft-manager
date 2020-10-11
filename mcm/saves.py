@@ -39,16 +39,17 @@ def save_exists(name, path):
     return get_save_from_name(name) or get_save_from_path(path)
 
 
-def add_server(server_name, version_string, path):
+def add_server(name, fork, version, path):
     """
     add a server to the save list and save the file
     """
     server = dict()
-    server['name'] = server_name
-    server['version'] = version_string
+    server['name'] = name
+    server['fork'] = fork
+    server['version'] = version
     server['path'] = str(path)
     saves = get_saves()
-    if save_exists(server_name, path):
+    if save_exists(name, path):
         print('A server with that name or path already exists')
     saves.append(server)
     if not Path(Path.home(), '.config/mcm/').exists():
