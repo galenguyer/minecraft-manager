@@ -9,8 +9,9 @@ import json
 from pathlib import Path
 from urllib.request import urlopen, urlretrieve
 
-import utils # pylint: disable=import-error
-import scripts # pylint: disable=import-error
+from .utils import reporthook
+from .scripts import create_start_script, create_systemd_file
+
 
 MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 4)
 
@@ -90,12 +91,12 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     if not args.name:
         server_name = path.name
 
-    urlretrieve(server_url, f'{path}/minecraft-server-{selected_version}.jar', utils.reporthook)
+    urlretrieve(server_url, f'{path}/minecraft-server-{selected_version}.jar', reporthook)
     time.sleep(0.5)
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {path}')
 
-    scripts.create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
-    scripts.create_systemd_file(server_name, path)
+    create_start_script(server_name, path, f'minecraft-server-{selected_version}.jar')
+    create_systemd_file(server_name, path)
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')
@@ -153,12 +154,12 @@ def create_paper(args):
         server_name = path.name
 
     urlretrieve(f'https://papermc.io/api/v1/paper/{version}/{build}/download', \
-        f'{path}/paper-{version}-{build}.jar', utils.reporthook)
+        f'{path}/paper-{version}-{build}.jar', reporthook)
     time.sleep(0.5)
     print(f'\nDownloaded paper-{version}-{build}.jar to {path}')
 
-    scripts.create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
-    scripts.create_systemd_file(server_name, path)
+    create_start_script(server_name, path, f'{path}/paper-{version}-{build}.jar')
+    create_systemd_file(server_name, path)
 
     #print('If you opted to create a systemd service, start the server by running ' + \
     #    f'"systemctl start {server_name}" as root')

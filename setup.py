@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="minecraft-manager",
-    version="0.5.1",
+    version="0.6.0",
     author="Galen Guyer",
     author_email="galen@galenguyer.com",
     description="a command line tool for creating minecraft servers with a start script and optional systemd file",
