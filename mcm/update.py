@@ -15,7 +15,38 @@ def update_paper(args, save):
     """
     update a given paper server
     """
-    _, _ = args, save
+    paper_versions = json.loads(
+        urlopen('https://papermc.io/api/v1/paper')\
+            .read().decode('utf-8'))
+    if args.version is None or args.version == 'latest':
+        version = paper_versions['versions'][0]
+    else:
+        version = args.version.partition('-')[0]
+        if version not in paper_versions['versions']:
+            print(f'invalid paper version {args.version}')
+            sys.exit(1)
+    # now that we have a good version, get the build number
+    paper_builds = json.loads(
+        urlopen(f'https://papermc.io/api/v1/paper/{version}')\
+            .read().decode('utf-8'))
+    if args.version is not None and '-' in args.version:
+        build = args.version.partition('-')[2]
+        if build not in paper_builds['builds']['all']:
+            print(f'invalid paper build {build}')
+            sys.exit(1)
+    else:
+        build = paper_builds['builds']['latest']
+    print(f'updating to paper version {version}, build {build}')
+
+    urlretrieve(f'https://papermc.io/api/v1/paper/{version}/{build}/download', \
+        f'{save["path"]}/paper-{version}-{build}.jar', reporthook)
+    time.sleep(0.5)
+    print(f'\nDownloaded paper-{version}-{build}.jar to {save["path"]}')
+
+    create_start_script(save['name'], save['path'], f'{save["path"]}/paper-{version}-{build}.jar')
+
+    print(f'{save["name"]} updated to version paper-{version}-{build}. ' + \
+        'if you\' using systemd, be sure to restart the server')
 
 
 def update_vanilla(args, save):
