@@ -56,3 +56,23 @@ def add_server(name, fork, version, path):
         Path(Path.home(), '.config/mcm/').mkdir(parents=True)
     with open(Path(Path.home(), '.config/mcm/saves.json'), 'wt') as file:
         file.write(json.dumps(saves, indent=4))
+
+
+def update_server_version(name, version):
+    """
+    update a server's version
+    """
+    saves = get_saves()
+
+    server = get_save_from_name(name)
+    server['version'] = version
+
+    for i, item in enumerate(saves):
+        if item['name'] == name:
+            saves[i] = server
+            break
+
+    if not Path(Path.home(), '.config/mcm/').exists():
+        Path(Path.home(), '.config/mcm/').mkdir(parents=True)
+    with open(Path(Path.home(), '.config/mcm/saves.json'), 'wt') as file:
+        file.write(json.dumps(saves, indent=4))

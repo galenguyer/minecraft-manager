@@ -8,7 +8,7 @@ from urllib.request import urlopen, urlretrieve
 
 from .utils import reporthook
 from .scripts import create_start_script
-from .saves import get_save_from_name
+from .saves import update_server_version, get_save_from_name
 
 
 def update_paper(args, save):
@@ -44,6 +44,7 @@ def update_paper(args, save):
     print(f'\nDownloaded paper-{version}-{build}.jar to {save["path"]}')
 
     create_start_script(save['name'], save['path'], f'{save["path"]}/paper-{version}-{build}.jar')
+    update_server_version(save['name'], f'{version}-{build}')
 
     print(f'{save["name"]} updated to version paper-{version}-{build}. ' + \
         'if you\' using systemd, be sure to restart the server')
@@ -81,6 +82,7 @@ def update_vanilla(args, save):
     print(f'\nDownloaded minecraft-server-{selected_version}.jar to {save["path"]}')
 
     create_start_script(save['name'], save['path'], f'minecraft-server-{selected_version}.jar')
+    update_server_version(save['name'], f'{selected_version}')
 
     print(f'{save["name"]} updated to version {selected_version}. ' + \
         'if you\' using systemd, be sure to restart the server')
