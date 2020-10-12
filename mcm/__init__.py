@@ -5,6 +5,7 @@ import argparse
 
 from .create import create_vanilla, create_paper
 from .update import update_server
+from .saves import get_saves
 
 
 def handle_create(args):
@@ -22,6 +23,15 @@ def handle_update(args):
     dispatch update args
     """
     update_server(args)
+
+
+def handle_list(args): # pylint: disable=unused-argument
+    """
+    list available servers from save file
+    """
+    saves = get_saves()
+    for save in saves:
+        print(f'server name {save["name"]}, {save["fork"]} fork, version {save["version"]}')
 
 
 def main():
@@ -53,6 +63,12 @@ def main():
     update_parser.add_argument('name', help='the name of the server to update')
     update_parser.add_argument('--version', '-v', help='the version of the selected server to use')
     update_parser.set_defaults(handle=handle_update)
+
+    update_parser = subparsers.add_parser(
+        'list',
+        help='list all available servers'
+    )
+    update_parser.set_defaults(handle=handle_list)
 
     args = parser.parse_args()
     if hasattr(args, 'handle'):
