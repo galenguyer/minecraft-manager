@@ -47,7 +47,7 @@ def update_paper(args, save):
     update_server_version(save['name'], f'{version}-{build}')
 
     print(f'{save["name"]} updated to version paper-{version}-{build}. ' + \
-        'if you\' using systemd, be sure to restart the server')
+        'if you\'re using systemd, be sure to restart the server')
 
 
 def update_vanilla(args, save):
@@ -85,7 +85,7 @@ def update_vanilla(args, save):
     update_server_version(save['name'], f'{selected_version}')
 
     print(f'{save["name"]} updated to version {selected_version}. ' + \
-        'if you\' using systemd, be sure to restart the server')
+        'if you\'re using systemd, be sure to restart the server')
 
 
 def update_server(args):

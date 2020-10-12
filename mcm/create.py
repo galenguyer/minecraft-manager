@@ -103,8 +103,8 @@ def create_vanilla(args): # pylint: disable=too-many-branches,too-many-statement
     create_systemd_file(server_name, path)
     add_server(server_name, 'vanilla', f'{selected_version}', path)
 
-    #print('If you opted to create a systemd service, start the server by running ' + \
-    #    f'"systemctl start {server_name}" as root')
+    print('If you opted to create a systemd service, start the server by running ' + \
+        f'"systemctl start {server_name}" as root')
     print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G ' + \
         f'minecraft-server-{selected_version}.jar nogui". The -Xm options refer to ' + \
         'minimum and maximum memory allocated to the JVM. Only edit these if you ' + \
@@ -171,8 +171,8 @@ def create_paper(args):
     create_systemd_file(server_name, path)
     add_server(server_name, 'paper', f'{version}-{build}', path)
 
-    #print('If you opted to create a systemd service, start the server by running ' + \
-    #    f'"systemctl start {server_name}" as root')
+    print('If you opted to create a systemd service, start the server by running ' + \
+        f'"systemctl start {server_name}" as root')
     print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G ' + \
         f'paper-{version}-{build}.jar nogui". The -Xm options refer to ' + \
         'minimum and maximum memory allocated to the JVM. Only edit these if you ' + \
