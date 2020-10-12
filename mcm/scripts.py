@@ -6,6 +6,9 @@ import pwd
 from pathlib import Path
 
 
+MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 6)
+
+
 def create_start_script(server_name, path, jar_name):
     """
     create the startup script given a few arguments
@@ -26,8 +29,9 @@ set -o pipefail
 if screen -list | grep -q "^{server_name}-mc$"; then
     screen -S "{server_name}-mc" -X quit 2>&1 >/dev/null
 fi
-screen -dmS "{server_name}-mc" java -jar {jar_name} nogui
+screen -dmS "{server_name}-mc" java -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=100 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:G1MixedGCLiveThresholdPercent=35 -XX:+AlwaysPreTouch -XX:+ParallelRefProcEnabled -Dusing.aikars.flags=mcflags.emc.gs -jar {jar_name} nogui
 '''
+
     with open(Path(path, 'start.sh'), 'wt') as script_fd:
         script_fd.write(start_script)
     Path(path, 'start.sh').chmod(0o744)

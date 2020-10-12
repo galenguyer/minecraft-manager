@@ -13,7 +13,7 @@ from .scripts import create_start_script, create_systemd_file
 from .saves import add_server, save_exists
 
 
-MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 4)
+MEM_SIZE = min(((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES'))/(1024.**3)), 6)
 
 
 def get_path(args):
