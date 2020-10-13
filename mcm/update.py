@@ -100,3 +100,5 @@ def update_server(args):
         update_paper(args, save)
     elif save['fork'] == 'vanilla':
         update_vanilla(args, save)
+    else:
+        print(f'uh oh, someone made a fucky wucky, there\'s no updater for the {save["fork"]} fork yet')
