@@ -114,10 +114,8 @@ def update_forge(args, save): # pylint: disable=too-many-branches
         else:
             print(f'invalid build {args.version}')
             sys.exit(1)
-    elif args.version == 'latest' or len(parsed_page.find_all('div', attrs={'class': 'download'})) == 1:
-        link = parsed_page.find_all('div', attrs={'class': 'download'})[0].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2]
-    else: # if args.version is None, get reccomended for given version
-        link = parsed_page.find_all('div', attrs={'class': 'download'})[1].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2]
+    
+    link = parsed_page.find_all('div', attrs={'class': 'download'})[0].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2] if args.version == 'latest' or len(parsed_page.find_all('div', attrs={'class': 'download'})) == 1 else parsed_page.find_all('div', attrs={'class': 'download'})[1].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2]
 
     version = link.partition('/forge/')[2].partition('/')[0].partition('-')[0] + '-' + link.partition('/forge/')[2].partition('-')[2].partition('-')[0].partition('/')[0]
     print(f'updating to forge version {version}')
