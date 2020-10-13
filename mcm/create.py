@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 from urllib.request import urlopen, urlretrieve
 
+import requests
+from bs4 import BeautifulSoup
+
 from .utils import reporthook
 from .scripts import create_start_script, create_systemd_file
 from .saves import add_server, save_exists
@@ -175,6 +178,72 @@ def create_paper(args):
         f'"systemctl start {server_name}" as root')
     print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G ' + \
         f'paper-{version}-{build}.jar nogui". The -Xm options refer to ' + \
+        'minimum and maximum memory allocated to the JVM. Only edit these if you ' + \
+        'experience performance issues and you know what you\'re doing.')
+    sys.exit(0)
+
+
+def create_forge(args): # pylint: disable=too-many-branches
+    """
+    forge download handler
+    """
+    if args.version is None or args.version == 'latest':
+        page = requests.get('https://files.minecraftforge.net/')
+    else:
+        version = args.version.partition('-')[0]
+        page = requests.get(f'https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_{version}.html')
+    if page.status_code  != 200:
+        print(f'invalid forge version {version}')
+        sys.exit(1)
+
+    parsed_page = BeautifulSoup(page.text, 'html.parser')
+    if args.version is not None and '-' in args.version:
+        links = [e['href'] for e in parsed_page.find_all('a') if \
+            'Direct Download' in e.text and 'universal' in e['href'] \
+            and f'/{args.version}' in e['href']]
+        if len(links) > 0:
+            link = links[0]
+        else:
+            print(f'invalid build {args.version}')
+            sys.exit(1)
+    elif args.version == 'latest' or len(parsed_page.find_all('div', attrs={'class': 'download'})) == 1:
+        link = parsed_page.find_all('div', attrs={'class': 'download'})[0].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2]
+    else: # if args.version is None, get reccomended for given version
+        link = parsed_page.find_all('div', attrs={'class': 'download'})[1].find_all('div', attrs={'class': 'link'})[-1].find_all('a')[0]['href'].partition('url=')[2]
+
+    version = link.partition('/forge/')[2].partition('/')[0].partition('-')[0] + '-' + link.partition('/forge/')[2].partition('-')[2].partition('-')[0]
+    print(f'using forge version {version}')
+
+    # if a name argument was provided, make sure it's valid
+    if args.name:
+        server_name = args.name.strip()
+        for char in server_name:
+            if not (char.isalpha() or char.isnumeric()):
+                print(f'invalid character "{char}" in name. only letters and numbers are allowed')
+                sys.exit(1)
+
+    path = get_path(args)
+
+    # if no name was given, derive it from the base name of the directory
+    if not args.name:
+        server_name = path.name
+
+    if save_exists(server_name, path):
+        print('a server with that name or path already exists')
+        sys.exit(1)
+
+    urlretrieve(link, f'{path}/forge-{version}.jar', reporthook)
+    time.sleep(0.5)
+    print(f'\nDownloaded forge-{version}.jar to {path}')
+
+    create_start_script(server_name, path, f'{path}/forge-{version}.jar')
+    create_systemd_file(server_name, path)
+    add_server(server_name, 'forge', f'{version}', path)
+
+    print('If you opted to create a systemd service, start the server by running ' + \
+        f'"systemctl start {server_name}" as root')
+    print(f'Otherwise, run it with "java -jar -Xms{MEM_SIZE}G -Xmx{MEM_SIZE}G ' + \
+        f'forge-{version}.jar nogui". The -Xm options refer to ' + \
         'minimum and maximum memory allocated to the JVM. Only edit these if you ' + \
         'experience performance issues and you know what you\'re doing.')
     sys.exit(0)

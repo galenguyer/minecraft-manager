@@ -3,7 +3,7 @@ option parsing file for the minecraft manager
 """
 import argparse
 
-from .create import create_vanilla, create_paper
+from .create import create_vanilla, create_paper, create_forge
 from .update import update_server
 from .saves import get_saves
 
@@ -16,7 +16,8 @@ def handle_create(args):
         create_vanilla(args)
     elif args.module == 'paper':
         create_paper(args)
-
+    elif args.module == 'forge':
+        create_forge(args)
 
 def handle_update(args):
     """
@@ -49,7 +50,7 @@ def main():
     )
 
     create_parser.add_argument('module', help='the module to use when creating a server',
-        choices=['vanilla', 'minecraft', 'paper'])
+        choices=['vanilla', 'minecraft', 'paper', 'forge'])
     create_parser.add_argument('--version', '-v', help='the version of the selected server to use')
     create_parser.add_argument('--path', '-p', help='path to save the jar to')
     create_parser.add_argument('--name', '-n',
